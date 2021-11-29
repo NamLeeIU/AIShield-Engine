@@ -1,1 +1,1 @@
-Contain origignal audio files
+Contain original audio files
