@@ -40,7 +40,7 @@ def pre_process_all():
   dir_path = "..process_data/data/"
   silence_index = []
   silence_fname = []
-  for num,fname in enumerate(train_df["path"]):
+  for num,fname in enumerate(train_df["name"]):
     path = "..raw_data/data/" + fname
     try:
       pre_process(path,fname,dir_path)
@@ -50,7 +50,7 @@ def pre_process_all():
   train_silence_ls = pd.concat([pd.Series(silence_index), pd.Series(silence_fname)],
                         axis=1)
   train_silence_ls.columns = ['index_in_rawdata', 'fname']
-  train_silence_ls.to_csv("..raw_data/silence_data.csv",index=False)
+  train_silence_ls.to_csv("..raw_data/silence.csv",index=False)
 
     
 def zero_pad(path):
@@ -82,7 +82,7 @@ def extract_all(df):
     return Xmfcc
   
 def extract_data():
-    df = pd.read_csv("..data/path_data.csv")
+    df = pd.read_csv("..data/data.csv")
     Xmfcc = extract_all(train_df) 
     mfcc_df = pd.DataFrame(Xmfcc)
     mfcc_df.to_csv("..process_data/features/mfcc_features.csv", index=False)
@@ -115,17 +115,13 @@ def predict_mean(fname):
     submission.to_csv("..results.csv", index=0)
     
 
-def build_test_path(fname):
-    meta_df = pd.read_csv(f"..raw_data/{fname}.csv")
-    df = pd.DataFrame()
-    df["path"] = meta_df["uuid"].apply(lambda uuid: f"..raw_data/data/{uuid}.wav")
-    df.to_csv("..raw_data/path_data.csv", index=False)
     
-def build_preprocess_path(fname): 
+def build_path(fname): 
     meta_df = pd.read_csv(f"..raw_data/{fname}.csv")
     df = pd.DataFrame()
-    df["path"] = meta_df["uuid"].apply(lambda uuid: f"{uuid}.wav")
+    df["name"] = meta_df["uuid"].apply(lambda uuid: f"{uuid}.wav")
+    df["path"] = meta_df["uuid"].apply(lambda uuid: f"..raw_data/data/{uuid}.wav")
     df.to_csv("..raw_data/data.csv", index=False)
     
-    
- 
+
+
