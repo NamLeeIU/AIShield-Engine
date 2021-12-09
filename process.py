@@ -94,8 +94,8 @@ def prepare_test():
     return X_test
     
   
-def predict_mean(fname):
-    test_df = pd.read_csv(f"..raw_data/{fname}.csv")
+def predict_mean(df):
+    test_df = df
     X_test = prepare_test()
     res = np.zeros(X_test.shape[0])
     res = res[...,np.newaxis]
@@ -105,25 +105,24 @@ def predict_mean(fname):
         preds = model.predict(X_test)
         res += model.predict(X_test) 
     res /= len(model_list)
-    submission = pd.DataFrame()
-    submission["uuid"] = test_df["uuid"]
-    submission["assessment_result"] = res
-    submission.to_csv("..results.csv", index=0)
+    positive_proba = res
+    return positive_proba
     
 
     
-def build_path(fname): 
-    meta_df = pd.read_csv(f"..raw_data/{fname}.csv")
+def build_path(df): 
+    meta_df = df
     df = pd.DataFrame()
     df["name"] = meta_df["uuid"].apply(lambda uuid: f"{uuid}.wav")
     df["path"] = meta_df["uuid"].apply(lambda uuid: f"..raw_data/data/{uuid}.wav")
     df.to_csv("..raw_data/data.csv", index=False)
  
-
-if __name__ == '__main__':
-  build_path("metadata")
+def predict(df):
+  build_path(df)
   pre_process_all()
   zpad_all()
   extract_data()
-  predict_mean("metadata")
+  positive_proba = predict_mean(df)
+
+   
   
