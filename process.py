@@ -4,12 +4,8 @@ import librosa
 import pandas as pd
 import numpy as np
 import malaya_speech
-from malaya_speech import Pipeline
-from pydub import AudioSegment
 from pydub.silence import split_on_silence
 import soundfile as sf
-import matplotlib.pyplot as plt
-import IPython.display as ipd
 from keras.models import load_model
 
 
@@ -122,6 +118,12 @@ def build_path(fname):
     df["name"] = meta_df["uuid"].apply(lambda uuid: f"{uuid}.wav")
     df["path"] = meta_df["uuid"].apply(lambda uuid: f"..raw_data/data/{uuid}.wav")
     df.to_csv("..raw_data/data.csv", index=False)
-    
+ 
 
-
+if __name__ == '__main__':
+  build_path("metadata")
+  pre_process_all()
+  zpad_all()
+  extract_data()
+  predict_mean("metadata")
+  
