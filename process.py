@@ -9,7 +9,6 @@ import soundfile as sf
 from keras.models import load_model
 
 
-
 def pre_process(path):
 		y, sr = librosa.load(path,res_type='kaiser_fast')
 		y_int = malaya_speech.astype.float_to_int(y)
@@ -34,11 +33,9 @@ def pre_process(path):
  
   
 def pre_process_all(df):
-		for num,path in enumerate(df["path"]):
-			try:
-				y,sr = pre_process(path)
-			except:
-				print("The audio can not be processed because of lacking cough sounds!")
+		path = df["path"][0]
+		pre_process(path)
+			
  
 	
 def zero_pad(path):
@@ -89,9 +86,9 @@ def predict_mean(df):
     X_test = prepare_test(df)
     res = np.zeros(X_test.shape[0])
     res = res[...,np.newaxis]
-    model_list = os.listdir("..weights/")
+    model_list = os.listdir("../weights")
     for name in model_list:
-        model = load_model("..weights/" + name)
+        model = load_model("../weights/" + name)
         preds = model.predict(X_test)
         res += model.predict(X_test) 
     res /= len(model_list)
@@ -99,18 +96,11 @@ def predict_mean(df):
     return positive_proba
     
 
-    
-def build_path(df): 
-    meta_df = df
-    df = pd.DataFrame()
-    df["name"] = meta_df["uuid"].apply(lambda uuid: f"{uuid}.wav")
-    df["path"] = meta_df["uuid"].apply(lambda uuid: f"..raw_data/data/{uuid}.wav")
-    df.to_csv("..raw_data/data.csv", index=False)
+  
  
 def predict(df):
     meta_df = df
     df = pd.DataFrame()
-    df["name"] = meta_df["uuid"].apply(lambda uuid: f"{uuid}.wav")
     df["path"] = meta_df["file_path"]
     pre_process_all(df)
     zpad_all(df)
