@@ -10,7 +10,7 @@ from keras.models import load_model
 
 
 
-def pre_process(path,fname,dir_path):
+def pre_process(path):
 		y, sr = librosa.load(path,res_type='kaiser_fast')
 		y_int = malaya_speech.astype.float_to_int(y)
 		audio = AudioSegment(
@@ -28,27 +28,18 @@ def pre_process(path,fname,dir_path):
 		y_ = sum(audio_chunks)
 		y_ = np.array(y_.get_array_of_samples())
 		y_ = malaya_speech.astype.int_to_float(y_)
-		dir_path = dir_path + fname
-		sf.write(dir_path, data = y_, samplerate = sr)
+		os.remove(path)
+		sf.write(path, data = y_, samplerate = sr)
+                
  
   
-def pre_process_all():
-		train_df = pd.read_csv("..raw_data/data.csv")
-		dir_path = "..process_data/data/"
-		silence_index = []
-		silence_fname = []
-		for num,fname in enumerate(train_df["name"]):
-			path = "..raw_data/data/" + fname
+def pre_process_all(df):
+		for num,path in enumerate(df["path"]):
 			try:
-				pre_process(path,fname,dir_path)
+				y,sr = pre_process(path)
 			except:
-				silence_index.append(num)
-				silence_fname.append(fname)
-		train_silence_ls = pd.concat([pd.Series(silence_index), pd.Series(silence_fname)],
-													axis=1)
-		train_silence_ls.columns = ['index_in_rawdata', 'fname']
-		train_silence_ls.to_csv("..raw_data/silence.csv",index=False)
-	
+				print("The audio can not be processed because of lacking cough sounds!")
+ 
 	
 def zero_pad(path):
 		pad_ms = 5000  # Add here the fix length you want (in milliseconds)
@@ -60,36 +51,32 @@ def zero_pad(path):
 			padded.export(path, format='wav')
   
 
-def zpad_all():
-		data_dir = os.listdir("..process_data/data")
-		for fname in data_dir:
-			path = "..process_data/" + fname
-			zero_pad(path)  
-
+def zpad_all(df):
+                for path in df["path"]:
+                        zero_pad(path)
     
-def mean_feature(path):
+def feature(path):
 		source, sr = librosa.load(path, res_type="kaiser_fast")
-		mfcc = librosa.feature.mfcc(y=source[0:110250], sr=sr, n_mfcc=13)      
+		mfcc = librosa.feature.mfcc(y=source[0:sr*5], sr=sr, n_mfcc=13)      
 		return mfcc
    
     
 def extract_all(df):
 		Xmfcc = []
 		for path in df["path"]:
-				mfcc = mean_feature(path)
+				mfcc = feature(path)
 				mfcc = mfcc.reshape(-1,)
 				Xmfcc.append(mfcc)
 		return Xmfcc
   
-def extract_data():
-    df = pd.read_csv("..data/data.csv")
-    Xmfcc = extract_all(train_df) 
+def extract_data(df):
+    Xmfcc = extract_all(df) 
     mfcc_df = pd.DataFrame(Xmfcc)
-    mfcc_df.to_csv("..process_data/features/mfcc_features.csv", index=False)
+    return mfcc_df
     
     
-def prepare_test():
-    mfcc = pd.read_csv("..process_data/features/mfcc_features.csv")
+def prepare_test(df):
+    mfcc = df
     test_df = mfcc.iloc[:, :]
     X_test = test_df.iloc[:,:].values.reshape(test_df.shape[0],13,-1)
     print(test_df.shape)
@@ -99,8 +86,7 @@ def prepare_test():
     
   
 def predict_mean(df):
-    test_df = df
-    X_test = prepare_test()
+    X_test = prepare_test(df)
     res = np.zeros(X_test.shape[0])
     res = res[...,np.newaxis]
     model_list = os.listdir("..weights/")
@@ -122,18 +108,15 @@ def build_path(df):
     df.to_csv("..raw_data/data.csv", index=False)
  
 def predict(df):
-		meta_df = df
+    meta_df = df
     df = pd.DataFrame()
     df["name"] = meta_df["uuid"].apply(lambda uuid: f"{uuid}.wav")
-    df["path"] = meta_df["uuid"].apply(lambda uuid: f"..raw_data/data/{uuid}.wav")
-    df.to_csv("..raw_data/data.csv", index=False)
-		
-		build_path(df)
-		pre_process_all()
-		zpad_all()
-		extract_data()
-		positive_proba = predict_mean(df)
-		return positive_proba
+    df["path"] = meta_df["file_path"]
+    pre_process_all(df)
+    zpad_all(df)
+    mfcc_df = extract_data(df)
+    positive_proba = predict_mean(mfcc_df)
+    return positive_proba
 
    
   
