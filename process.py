@@ -106,7 +106,7 @@ def predict(df):
     zpad_all(df)
     mfcc_df = extract_data(df)
     positive_proba = predict_mean(mfcc_df)
-    return positive_proba
+    return positive_proba[0]
 
    
   
