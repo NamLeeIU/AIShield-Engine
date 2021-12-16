@@ -10,7 +10,7 @@ from pydub.silence import split_on_silence
 import soundfile as sf
 import matplotlib.pyplot as plt
 import IPython.display as ipd
-
+from zeropad import zero_pad
 
 def pre_process(path,fname,dir_path):
   y, sr = librosa.load(path,res_type='kaiser_fast')
@@ -45,13 +45,10 @@ def pre_process_all():
     try:
       pre_process(path,fname,dir_path)
     except:
-      silence_index.append(num)
-      silence_fname.append(fname)
-  train_silence_ls = pd.concat([pd.Series(silence_index), pd.Series(silence_fname)],
-                        axis=1)
-  train_silence_ls.columns = ['index_in_train', 'fname']
-  train_silence_ls.to_csv("..test_data/train_silence.csv",index=False)
-
+      pad_ms = 5000  # Add here the fix length you want (in milliseconds)
+      silence = AudioSegment.silent(duration=pad_ms)
+      silence.export(dir_path+fname,format='wav')
+      
   # ==============================================================================
   private_df = pd.read_csv("..data/test_private.csv")
   dir_path = "..test_data/private/"
@@ -62,13 +59,12 @@ def pre_process_all():
     try:
       pre_process(path,fname,dir_path)
     except:
-      silence_index.append(num)
-      silence_fname.append(fname)
-  private_silence_ls = pd.concat([pd.Series(silence_index), pd.Series(silence_fname)],
-                        axis=1)
-  private_silence_ls.columns = ['index_in_private', 'fname']
-  private_silence_ls.to_csv("..test_data/private_silence.csv",index=False)
-
+      pad_ms = 5000  # Add here the fix length you want (in milliseconds)
+      silence = AudioSegment.silent(duration=pad_ms)
+      silence.export(dir_path+fname,format='wav')
+  
+      
+  
   # ==============================================================================
   public_df = pd.read_csv("..data/test_public.csv")
   dir_path = "..test_data/public/"
@@ -79,13 +75,9 @@ def pre_process_all():
     try:
       pre_process(path,fname,dir_path)
     except:
-      silence_index.append(num)
-      silence_fname.append(fname)
-  public_silence_ls = pd.concat([pd.Series(silence_index), pd.Series(silence_fname)],
-                        axis=1)
-  public_silence_ls.columns = ['index_in_public', 'fname']
-  public_silence_ls.to_csv("..test_data/public_silence.csv",index=False)
-  
+      pad_ms = 5000  # Add here the fix length you want (in milliseconds)
+      silence = AudioSegment.silent(duration=pad_ms)
+      silence.export(dir_path+fname,format='wav')
 
 if __name__ == "__main__":
    pre_process_all()
