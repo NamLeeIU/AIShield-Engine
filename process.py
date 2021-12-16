@@ -59,9 +59,13 @@ def pre_process(path):
   
 def pre_process_all(df):
 		path = df["path"][0]
-		pre_process(path)
+		try:
+			pre_process(path)
 			
- 
+ 		except:
+			pad_ms = 5000  # Add here the fix length you want (in milliseconds)
+      			silence = AudioSegment.silent(duration=pad_ms)
+      			silence.export(path,format='wav')
 	
 def zero_pad(path):
 		pad_ms = 5000  # Add here the fix length you want (in milliseconds)
