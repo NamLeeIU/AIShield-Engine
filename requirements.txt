@@ -1,0 +1,8 @@
+keras          
+librosa        
+malaya_speech  
+numpy          
+pandas         
+pydub          
+sklearn        
+tensorflow     
