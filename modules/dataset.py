@@ -1,4 +1,3 @@
-from pydub import AudioSegment
 import librosa
 import pandas as pd
 import numpy as np

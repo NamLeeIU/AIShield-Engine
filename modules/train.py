@@ -24,11 +24,12 @@ def prepare_training_data(Config):
 
 
 def train():
+    print("====== PREPARE TRAINING DATA ======")
     train_data = prepare_training_data(Config)
+    print("====== TRAINING ======")
     train_data, y = train_data.iloc[:, :-1].values.reshape(
         train_data.shape[0], 13, -1), train_data.iloc[:, -1].values
     skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
-
     fold = 1
     for train_index, val_index in skf.split(train_data, y):
         X_train = train_data[train_index]
@@ -37,10 +38,6 @@ def train():
         y_validation = y[val_index]
         X_train = X_train[..., np.newaxis]
         X_validation = X_validation[..., np.newaxis]
-        print(X_train.shape)
-        print(X_validation.shape)
-        print(y_train.shape)
-        print(y_validation.shape)
         input_shape = (X_train.shape[1], X_train.shape[2], 1)
         cnn = CNNModel(input_shape)
         model = cnn.define()
@@ -49,7 +46,6 @@ def train():
                       loss='binary_crossentropy',
                       metrics=['accuracy'])
 
-        model.summary()
         model_name = str(Config.WEIGHT_PATH/f"model-kfold-{fold}.h5")
         model.fit(X_train, y_train, validation_data=(
             X_validation, y_validation), batch_size=50, epochs=50)

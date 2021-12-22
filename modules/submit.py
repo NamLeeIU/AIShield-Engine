@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 import numpy as np
-from keras.models import load_model
-from configs.config import Config
 import zipfile
+from tensorflow.keras.models import load_model
+from configs.config import Config
 from modules.dataset import pre_process
 from modules.feature import mfcc_feature
 
