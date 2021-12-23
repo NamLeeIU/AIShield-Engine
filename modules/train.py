@@ -27,8 +27,10 @@ def train():
     print("====== PREPARE TRAINING DATA ======")
     train_data = prepare_training_data(Config)
     print("====== TRAINING ======")
-    train_data, y = train_data.iloc[:, :-1].values.reshape(
-        train_data.shape[0], 13, -1), train_data.iloc[:, -1].values
+    y = train_data['label'].values
+    train_data.drop(['label'], axis=1, inplace=True)
+    train_data = train_data.iloc[:, :].values.reshape(
+        train_data.shape[0], 13, -1)
     skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
     fold = 1
     for train_index, val_index in skf.split(train_data, y):

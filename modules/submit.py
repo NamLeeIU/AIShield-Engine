@@ -26,7 +26,6 @@ def create_submission():
             Xmfcc.append(mfcc)
 
     mfcc_df = pd.DataFrame(Xmfcc)
-    mfcc_df.to_csv(str(Config.DATASET_PATH/"test_df.csv"))
     X_test = mfcc_df.iloc[:, :].values.reshape(mfcc_df.shape[0], 13, -1)
     X_test = X_test[..., np.newaxis]
     model_list = os.listdir(Config.WEIGHT_PATH)

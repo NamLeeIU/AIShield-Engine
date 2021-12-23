@@ -40,35 +40,44 @@ def download_models():
         "model-kfold-5.h5": "1AlFNzlr-XSmyu20ozsDrX-2D4LkV8-y7",
     }
     for name, id in urls.items():
-        if (~(os.path.isfile(str(Config.WEIGHT_PATH/f"{name}")))):
+        if (not(os.path.isfile(str(Config.WEIGHT_PATH/f"{name}")))):
             url = f"https://drive.google.com/uc?id={id}"
             output = str(Config.WEIGHT_PATH/f"{name}")
             gdown.download(url, output, quiet=False)
             print(f"Loaded {name}")
 
+init_model = True
+def model_loading(init_model):
+    if(init_model):
+        model_list = os.listdir(Config.WEIGHT_PATH)
+        loaded_model = []
+        for name in model_list:
+            model = load_model(str(Config.WEIGHT_PATH/f"{name}"))   
+            loaded_model.append(model)
+        init_model = False
+        return loaded_model
 
 def predict(df):
     download_models()
     meta_df = pd.DataFrame()
     meta_df["path"] = df["file_path"]
-    Xmfcc = []
+    xmfcc = []
     try:
         source, sr = pre_process(meta_df.at[0, "path"])
         mfcc = mfcc_feature(source, sr)
         mfcc = mfcc.reshape(-1,)
-        Xmfcc.append(mfcc)
+        xmfcc.append(mfcc)
     except:
-        return 0.0
-    mfcc_df = pd.DataFrame(Xmfcc)
+        return -1
+    mfcc_df = pd.DataFrame(xmfcc)
     X_test = mfcc_df.iloc[:, :].values.reshape(mfcc_df.shape[0], 13, -1)
     X_test = X_test[..., np.newaxis]
     res = np.zeros(X_test.shape[0])
     res = res[..., np.newaxis]
-    model_list = os.listdir(Config.WEIGHT_PATH)
-    for name in model_list:
-        model = load_model(str(Config.WEIGHT_PATH/f"{name}"))
+    loaded_model = model_loading(init_model)
+    for model in loaded_model:
         res += model.predict(X_test)
-    res /= len(model_list)
+    res /= len(loaded_model)
     positive_proba = res
     positive_proba = np.asscalar(positive_proba[0])
     return positive_proba

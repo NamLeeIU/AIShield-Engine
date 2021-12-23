@@ -15,4 +15,5 @@ unzip -q aicv115m_extra_public_1235samples.zip -d ./
 rm -f aicv115m_final_public_train.zip
 rm -f aicv115m_extra_public_1235samples.zip
 
+
 cd ..

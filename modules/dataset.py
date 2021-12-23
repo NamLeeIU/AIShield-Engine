@@ -55,16 +55,16 @@ def get_train_data(train_meta_df, train_extra_df):
     train_df = pd.concat([train_df, extra_df], axis=0)
     train_df["silence"] = 0
     # ==============================================================================
-    Xmfcc = []
+    xmfcc = []
     for index, fname in enumerate(train_df["path"]):
         try:
             source, sr = pre_process(fname)
             mfcc = mfcc_feature(source, sr)
             mfcc = mfcc.reshape(-1,)
-            Xmfcc.append(mfcc)
+            xmfcc.append(mfcc)
         except:
             train_df.at[index, "silence"] = 1
-    mfcc_df = pd.DataFrame(Xmfcc)
+    mfcc_df = pd.DataFrame(xmfcc)
     train_df = train_df.loc[train_df["silence"] == 0]
     train_df.reset_index(drop=True, inplace=True)
     mfcc_df["label"] = train_df["label"]

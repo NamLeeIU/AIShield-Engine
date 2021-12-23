@@ -7,4 +7,5 @@ __MACOSX/
 assets/
 ./data
 ./weights
+
 ./submissions
