@@ -32,20 +32,19 @@ def convert_to_wav(file_path):
     return wav_file_path
 
 
-def download_models():
-    urls = {
-        "model-kfold-1.h5": "1REzAtMyw7YE1g80JUUaEv92i4RVr1Mx4",
-        "model-kfold-2.h5": "1JSZGuTbogZsMIF0Q9jQ9vY7Jo16fNQjS",
-        "model-kfold-3.h5": "14tLtyF1OL5bDpwLw0I15bQjG_kT2K8bH",
-        "model-kfold-4.h5": "1q7Ju7vCKb0d2GdgDw2_5xlGuvWTz_GXa",
-        "model-kfold-5.h5": "1AlFNzlr-XSmyu20ozsDrX-2D4LkV8-y7",
-    }
-    for name, id in urls.items():
-        if (not(os.path.isfile(str(Config.WEIGHT_PATH/f"{name}")))):
-            url = f"https://drive.google.com/uc?id={id}"
-            output = str(Config.WEIGHT_PATH/f"{name}")
-            gdown.download(url, output, quiet=False)
-            print(f"Loaded {name}")
+urls = {
+    "model-kfold-1.h5": "1REzAtMyw7YE1g80JUUaEv92i4RVr1Mx4",
+    "model-kfold-2.h5": "1JSZGuTbogZsMIF0Q9jQ9vY7Jo16fNQjS",
+    "model-kfold-3.h5": "14tLtyF1OL5bDpwLw0I15bQjG_kT2K8bH",
+    "model-kfold-4.h5": "1q7Ju7vCKb0d2GdgDw2_5xlGuvWTz_GXa",
+    "model-kfold-5.h5": "1AlFNzlr-XSmyu20ozsDrX-2D4LkV8-y7",
+}
+for name, id in urls.items():
+    if (not(os.path.isfile(str(Config.WEIGHT_PATH/f"{name}")))):
+        url = f"https://drive.google.com/uc?id={id}"
+        output = str(Config.WEIGHT_PATH/f"{name}")
+        gdown.download(url, output, quiet=False)
+        print(f"Loaded {name}")
 
 
 model_list = os.listdir(Config.WEIGHT_PATH)
@@ -56,7 +55,6 @@ for name in model_list:
 
 
 def predict(df):
-    download_models()
     global loaded_model
     meta_df = pd.DataFrame()
     meta_df["path"] = df["file_path"]
@@ -79,4 +77,3 @@ def predict(df):
     positive_proba = res
     positive_proba = np.asscalar(positive_proba[0])
     return positive_proba
-    
