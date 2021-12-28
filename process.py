@@ -46,16 +46,22 @@ def download_models():
             gdown.download(url, output, quiet=False)
             print(f"Loaded {name}")
 
+
 init_model = True
-def model_loading(init_model):
-    if(init_model):
+
+
+def model_loading(init):
+    global init_model
+    if init:
         model_list = os.listdir(Config.WEIGHT_PATH)
-        loaded_model = []
+        models = []
         for name in model_list:
-            model = load_model(str(Config.WEIGHT_PATH/f"{name}"))   
-            loaded_model.append(model)
+            model = load_model(str(Config.WEIGHT_PATH/f"{name}"))
+            models.append(model)
         init_model = False
-        return loaded_model
+        model_loading.loaded_model = models
+    return model_loading.loaded_model
+
 
 def predict(df):
     download_models()
