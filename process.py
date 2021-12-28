@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from pydub import AudioSegment
 from tensorflow.keras.models import load_model
+from tensorflow.python.keras.saving.hdf5_format import load_model_from_hdf5
 from configs.config import Config
 from modules.dataset import pre_process
 from modules.feature import mfcc_feature
@@ -47,24 +48,16 @@ def download_models():
             print(f"Loaded {name}")
 
 
-init_model = True
-
-
-def model_loading(init):
-    global init_model
-    if init:
-        model_list = os.listdir(Config.WEIGHT_PATH)
-        models = []
-        for name in model_list:
-            model = load_model(str(Config.WEIGHT_PATH/f"{name}"))
-            models.append(model)
-        init_model = False
-        model_loading.loaded_model = models
-    return model_loading.loaded_model
+model_list = os.listdir(Config.WEIGHT_PATH)
+loaded_model = []
+for name in model_list:
+    model = load_model(str(Config.WEIGHT_PATH/f"{name}"))
+    loaded_model.append(model)
 
 
 def predict(df):
     download_models()
+    global loaded_model
     meta_df = pd.DataFrame()
     meta_df["path"] = df["file_path"]
     xmfcc = []
@@ -80,10 +73,10 @@ def predict(df):
     X_test = X_test[..., np.newaxis]
     res = np.zeros(X_test.shape[0])
     res = res[..., np.newaxis]
-    loaded_model = model_loading(init_model)
     for model in loaded_model:
         res += model.predict(X_test)
     res /= len(loaded_model)
     positive_proba = res
     positive_proba = np.asscalar(positive_proba[0])
     return positive_proba
+    

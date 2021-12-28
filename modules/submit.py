@@ -13,19 +13,19 @@ def create_submission():
         str(Config.ROOT_TEST_DIR / "private_test_sample_submission.csv"))
     test_df['path'] = test_df['uuid'].apply(lambda x: str(
         Config.ROOT_TEST_DIR / f"private_test_audio_files/{x}.wav"))
-    Xmfcc = []
+    xmfcc = []
     for index, fname in enumerate(test_df["path"]):
         try:
             source, sr = pre_process(fname)
             mfcc = mfcc_feature(source, sr)
             mfcc = mfcc.reshape(-1,)
-            Xmfcc.append(mfcc)
+            xmfcc.append(mfcc)
         except:
             mfcc = np.zeros(2808)
             mfcc = mfcc.reshape(-1,)
-            Xmfcc.append(mfcc)
+            xmfcc.append(mfcc)
 
-    mfcc_df = pd.DataFrame(Xmfcc)
+    mfcc_df = pd.DataFrame(xmfcc)
     X_test = mfcc_df.iloc[:, :].values.reshape(mfcc_df.shape[0], 13, -1)
     X_test = X_test[..., np.newaxis]
     model_list = os.listdir(Config.WEIGHT_PATH)
