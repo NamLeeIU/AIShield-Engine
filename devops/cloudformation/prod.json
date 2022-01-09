@@ -21,7 +21,7 @@
     },
     {
         "ParameterKey": "HostHeaderApi",
-        "ParameterValue": "shield.aicovidvn.org"
+        "ParameterValue": "aishield.aicovidvn.org"
     },
     {
         "ParameterKey": "APITag",
