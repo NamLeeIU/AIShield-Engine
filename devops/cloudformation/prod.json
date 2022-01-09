@@ -1,0 +1,70 @@
+[
+    {
+        "ParameterKey": "EnvironmentName",
+        "ParameterValue": "prod"
+    },
+    {
+        "ParameterKey": "ProjectName",
+        "ParameterValue": "aicovidvn"
+    },
+    {
+        "ParameterKey": "ContainerName",
+        "ParameterValue": "api-aishield"
+    },
+    {
+        "ParameterKey": "ApiPort",
+        "ParameterValue": "8000"
+    },
+    {
+        "ParameterKey": "ApiHealthCheckPath",
+        "ParameterValue": "/"
+    },
+    {
+        "ParameterKey": "HostHeaderApi",
+        "ParameterValue": "shield.aicovidvn.org"
+    },
+    {
+        "ParameterKey": "APITag",
+        "ParameterValue": "tag-e98fa31529a806813c6a66bee5880a6cb08e9345"
+    },
+    {
+        "ParameterKey": "DesiredCount",
+        "ParameterValue": "0"
+    },
+    {
+        "ParameterKey": "MinContainers",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "MaxContainers",
+        "ParameterValue": "4"
+    },
+    {
+        "ParameterKey": "TaskCPU",
+        "ParameterValue": "1024"
+    },
+    {
+        "ParameterKey": "TaskRAM",
+        "ParameterValue": "2GB"
+    },
+    {
+        "ParameterKey": "AutoScalingTargetValueCPU",
+        "ParameterValue": "60"
+    },
+    {
+        "ParameterKey": "AutoScalingTargetValueRAM",
+        "ParameterValue": "90"
+    },
+    {
+        "ParameterKey": "ListenerRulePriority",
+        "ParameterValue": "4"
+    },
+    {
+        "ParameterKey": "MountPathAssets",
+        "ParameterValue": "/app/assets"
+    },
+    {
+        "ParameterKey": "MountPathWeights",
+        "ParameterValue": "/app/weights"
+    }
+]

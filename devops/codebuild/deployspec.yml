@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  build:
+    on-failure: ABORT
+    commands:
+      - echo Now Codebuild will update new image to ECS service
+      - export REGISTRY_URL="852039983533.dkr.ecr.ap-southeast-1.amazonaws.com/prod-aicovidvn-api"
+      - export LASTEST_COMMIT_ID=${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - echo $LASTEST_COMMIT_ID
+      - sed -i -e "s+tag_changeme+${LASTEST_COMMIT_ID}+g" cloudformation/prod.json
+      - echo Updating Cloudformation Stack ...
+      - cd cloudformation && ls -ltr
+      - aws cloudformation update-stack --stack-name=prod-aicovidvn-api --template-body file://template.yaml --parameters file://prod.json --capabilities CAPABILITY_NAMED_IAM
+      # test cicd

@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - echo "checking version dependencies ..."
+      - apt install jq -y
+  build:
+    on-failure: ABORT
+    commands:
+      - echo Build started on `date`
+      - export STACK_NAME="prod-aicovidvn-api-top5"
+      - export REGISTRY_URL="852039983533.dkr.ecr.ap-southeast-1.amazonaws.com/${STACK_NAME}"
+      - export TAG_MARKER="tag-"
+      - export IMAGE_TAG="${TAG_MARKER}${CODEBUILD_RESOLVED_SOURCE_VERSION}"
+
+#      - aws ssm get-parameter --with-decryption --name /prod/api/env --region ap-southeast-1 | jq '.Parameter.Value'| sed 's/^"\(.*\)/\1/' |sed 's/.$//' | sed 's/\\n/\n/g' > .env
+      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 852039983533.dkr.ecr.ap-southeast-1.amazonaws.com
+      - docker build -f Dockerfile -t ${STACK_NAME} .
+      - echo Updating Tag ... then push docker image to ecr
+      - docker tag ${STACK_NAME}:latest ${REGISTRY_URL}:${IMAGE_TAG}
+      - docker push ${REGISTRY_URL}:${IMAGE_TAG}
+      - echo Build completed on `date`
+
+  post_build:
+    on-failure: ABORT
+    commands:
+      - echo Updating Cloudformation Stack ...
+      - cd devops/cloudformation && ls -ltr
+      - sed -i -e "s+${TAG_MARKER}[a-z,0-9]*+${IMAGE_TAG}+g" prod.json
+      - aws cloudformation update-stack --stack-name=${STACK_NAME} --template-body file://template.yaml --parameters file://prod.json --capabilities CAPABILITY_NAMED_IAM
