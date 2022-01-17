@@ -51,7 +51,7 @@ def train():
         model_name = str(Config.WEIGHT_PATH/f"model-kfold-{fold}.h5")
         model.fit(X_train, y_train, validation_data=(
             X_validation, y_validation), batch_size=50, epochs=50)
-        model.save(model_name)
+        model.save_weights(model_name)
         fold += 1
 
 
