@@ -8,6 +8,7 @@ from tensorflow.python.keras.saving.hdf5_format import load_model_from_hdf5
 from configs.config import Config
 from modules.dataset import pre_process
 from modules.feature import mfcc_feature
+from modules.model import CNNModel
 
 
 def convert_to_wav(file_path):
@@ -33,12 +34,13 @@ def convert_to_wav(file_path):
 
 
 urls = {
-    "model-kfold-1.h5": "1REzAtMyw7YE1g80JUUaEv92i4RVr1Mx4",
-    "model-kfold-2.h5": "1JSZGuTbogZsMIF0Q9jQ9vY7Jo16fNQjS",
-    "model-kfold-3.h5": "14tLtyF1OL5bDpwLw0I15bQjG_kT2K8bH",
-    "model-kfold-4.h5": "1q7Ju7vCKb0d2GdgDw2_5xlGuvWTz_GXa",
-    "model-kfold-5.h5": "1AlFNzlr-XSmyu20ozsDrX-2D4LkV8-y7",
+    "model-kfold-1.h5": "1uY5Lxz5JmKdHHtv9ABk7KQNlrdxFpqJI",
+    "model-kfold-2.h5": "1r87t8-LvNK6ydqy2LImyBadfKCJyhRHG",
+    "model-kfold-3.h5": "1eQVZBEE1FC6VbC1BK5IhJw_MwUCD58wC",
+    "model-kfold-4.h5": "18JVZ8qmC2iT8-jA7TifdnOtzqXFLlt7P",
+    "model-kfold-5.h5": "19mSvojmm5Ye6l2vi2-hYKOapM7Vd3p6a",
 }
+
 for name, id in urls.items():
     if (not(os.path.isfile(str(Config.WEIGHT_PATH/f"{name}")))):
         url = f"https://drive.google.com/uc?id={id}"
@@ -46,11 +48,13 @@ for name, id in urls.items():
         gdown.download(url, output, quiet=False)
         print(f"Loaded {name}")
 
-
 model_list = os.listdir(Config.WEIGHT_PATH)
 loaded_model = []
+input_shape = (13, 216, 1)
+cnn = CNNModel(input_shape)
+model = cnn.define()
 for name in model_list:
-    model = load_model(str(Config.WEIGHT_PATH/f"{name}"))
+    model.load_weights(str(Config.WEIGHT_PATH/f"{name}"))
     loaded_model.append(model)
 
 
