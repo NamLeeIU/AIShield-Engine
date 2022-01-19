@@ -6,7 +6,7 @@ from tensorflow.keras.models import load_model
 from configs.config import Config
 from modules.dataset import pre_process
 from modules.feature import mfcc_feature
-
+from modules.model import CNNModel
 
 def create_submission():
     test_df = pd.read_csv(
@@ -31,8 +31,11 @@ def create_submission():
     model_list = os.listdir(Config.WEIGHT_PATH)
     res = np.zeros(X_test.shape[0])
     res = res[..., np.newaxis]
+    input_shape = (X_test.shape[1],X_test.shape[2],1)
+    cnn = CNNModel(input_shape)
+    model = cnn.define()
     for name in model_list:
-        model = load_model(str(Config.WEIGHT_PATH/f"{name}"))
+        model.load_weights(str(Config.WEIGHT_PATH/f"{name}"))
         res += model.predict(X_test)
     res /= len(model_list)
     submission = pd.DataFrame()
