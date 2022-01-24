@@ -29,4 +29,5 @@ phases:
       - echo Updating Cloudformation Stack ...
       - cd devops/cloudformation && ls -ltr
       - sed -i -e "s+${TAG_MARKER}[a-z,0-9]*+${IMAGE_TAG}+g" prod.json
+      - sed -i -e 's+"0"+"2"+g' prod.json
       - aws cloudformation update-stack --stack-name=${STACK_NAME} --template-body file://template.yaml --parameters file://prod.json --capabilities CAPABILITY_NAMED_IAM

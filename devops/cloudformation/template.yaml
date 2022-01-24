@@ -91,11 +91,13 @@ Resources:
   APISecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-        GroupId: !Ref APISecurityGroup
-        IpProtocol: tcp
-        FromPort: 2049
-        ToPort: 2049
-        SourceSecurityGroupName: !Sub "${EnvironmentName}-${ProjectName}-sg-efs"
+      # Description: Add ECS's SG to Inbounds Rule of EFS's SG
+      GroupId:
+        Fn::ImportValue: !Sub "${EnvironmentName}-${ProjectName}-sg-efs"
+      IpProtocol: tcp
+      FromPort: 2049
+      ToPort: 2049
+      SourceSecurityGroupId: !Ref APISecurityGroup
 
 #### ENDING SECURITY GROUP ####
 
